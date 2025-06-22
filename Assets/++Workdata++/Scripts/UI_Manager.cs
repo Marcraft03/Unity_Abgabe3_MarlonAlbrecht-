@@ -1,5 +1,6 @@
 using UnityEngine;
-using UnityEngine.UI;  // Für Text-Komponente
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UI_Manager : MonoBehaviour
 {
@@ -7,15 +8,16 @@ public class UI_Manager : MonoBehaviour
 
     public GameObject gameOverPanel;
     public GameObject winPanel;
-    public Text winScoreText;  // Text-Komponente für Score + Zeit Anzeige
+    public Text winScoreText;   // Score + Zeit im Win-Screen
+    public GameObject player;   // Referenz zum Player-Objekt
 
     private void Awake()
     {
-        // Singleton Pattern, damit es nur eine Instanz gibt
+        // Singleton: Nur eine Instanz
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);  // bleibt über Szenen hinweg erhalten
         }
         else
         {
@@ -23,29 +25,53 @@ public class UI_Manager : MonoBehaviour
         }
     }
 
-    // Methode für den Winscreen mit Score und Zeit
     public void Winscreen(int score, float time)
     {
         if (winPanel != null)
         {
             winPanel.SetActive(true);
+
             if (winScoreText != null)
             {
-                winScoreText.text = "Score: " + score + "\nTime: " + time.ToString("F1") + "s";
+                winScoreText.text = "Score: " + score + "\nZeit: " + time.ToString("F1") + "s";
             }
+
+            StopPlayer();  // Spieler deaktivieren
         }
     }
 
-    // Methode für den Losescreen
     public void Losescreen()
     {
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
+            StopPlayer();  // Spieler deaktivieren
         }
     }
 
-    // Optionale Helfer: Win- oder GameOver-Bildschirme verbergen
+    private void StopPlayer()
+    {
+        if (player != null)
+        {
+            player.SetActive(false); // deaktiviert den Spieler komplett
+        }
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene("GameMap");
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("StartMenü");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
     public void HideWinScreen()
     {
         if (winPanel != null)
